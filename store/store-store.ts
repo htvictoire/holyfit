@@ -2,8 +2,9 @@ import { create } from "zustand"
 import { persist, createJSONStorage } from "zustand/middleware"
 import { immer } from "zustand/middleware/immer"
 import type { Product, CartItem, Cart, FilterState, WishlistItem, ComparisonItem } from "@/types/store-types"
-import { products } from "@/data/store-data"
+import { fetchStoreData } from "@/services/store-service"
 
+const products: Product[] = await fetchStoreData().then(data => data.products).catch(() => []);
 interface StoreState {
   // Core Data
   products: Product[]

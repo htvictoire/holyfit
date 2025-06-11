@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useStoreState } from "@/store/store-store"
-import { categories } from "@/data/store-data"
 import {
   Search,
   ShoppingCart,
@@ -39,6 +38,7 @@ import { EmptyState } from "@/components/store/empty-state"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types/store-types"
+import { fetchStoreData } from "@/services/store-service"
 
 // Loading Components
 const ProductCardSkeleton = () => (
@@ -51,6 +51,8 @@ const ProductCardSkeleton = () => (
     </div>
   </div>
 )
+
+const categories = await fetchStoreData().then((data) => data.categories)
 
 export default function StorePage() {
   const { filtered_products, filters, cart, selected_product, set_filters, toggle_cart, add_to_cart, apply_filters } =
@@ -698,7 +700,7 @@ export default function StorePage() {
             const message = `*My Holy Fit Order:*%0A%0A${cartText}${totalText}%0A%0APlease process my order. Thank you!`
 
             // Open WhatsApp with pre-filled message
-            window.open(`https://wa.me/1234567890?text=${message}`, "_blank")
+            window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${message}`, "_blank")
           }}
           className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-2xl flex items-center gap-2"
         >
