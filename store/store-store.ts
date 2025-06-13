@@ -4,7 +4,6 @@ import { immer } from "zustand/middleware/immer"
 import type { Product, CartItem, Cart, FilterState, WishlistItem, ComparisonItem } from "@/types/store-types"
 import { fetchStoreData } from "@/services/store-service"
 
-const products: Product[] = await fetchStoreData().then(data => data.products).catch(() => []);
 interface StoreState {
   // Core Data
   products: Product[]
@@ -36,6 +35,7 @@ interface StoreState {
   quick_view_product: Product | null
   is_product_modal_open: boolean
   is_quick_view_open: boolean
+  is_checkout_open: boolean
 
   // Search & Discovery
   search_history: string[]
@@ -103,6 +103,9 @@ interface StoreState {
   track_product_view: (product_id: string) => void
   track_search: (query: string) => void
   track_cart_abandonment: () => void
+
+  // Initialization Actions
+  initialize_store: () => Promise<void>
 }
 
 const initial_filters: FilterState = {
@@ -140,10 +143,10 @@ export const useStoreState = create<StoreState>()(
   persist(
     immer((set, get) => ({
       // Initial State
-      products,
-      filtered_products: products,
-      featured_products: products.filter((p) => p.rating && p.rating >= 4.5).slice(0, 8),
-      trending_products: products.filter((p) => p.original_price).slice(0, 6),
+      products: [],
+      filtered_products: [],
+      featured_products: [],
+      trending_products: [],
 
       filters: initial_filters,
       view_mode: "grid",
@@ -560,6 +563,21 @@ export const useStoreState = create<StoreState>()(
         set((state) => {
           state.analytics.cart_abandonment += 1
         })
+      },
+
+      initialize_store: async () => {
+        try {
+          const data = await fetchStoreData()
+          set((state) => {
+            state.products = data.products
+            state.filtered_products = data.products
+            state.featured_products = data.products.filter((p) => p.rating && p.rating >= 4.5).slice(0, 8)
+            state.trending_products = data.products.filter((p) => p.original_price).slice(0, 6)
+          })
+          get().apply_filters()
+        } catch (error) {
+          console.error("Failed to initialize store:", error)
+        }
       },
     })),
     {

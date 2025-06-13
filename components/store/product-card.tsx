@@ -13,7 +13,10 @@ interface ProductCardProps {
 
 export function ProductCard({ product, on_view, on_add_to_cart }: ProductCardProps) {
   return (
-    <div className="group relative overflow-hidden rounded-3xl bg-white/80 backdrop-blur-lg border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+    <div 
+      className="group relative overflow-hidden rounded-3xl bg-white/80 backdrop-blur-lg border border-gray-200/50 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+      onClick={on_view}
+    >
       <div className="relative aspect-square overflow-hidden">
         <img
           src={product.image || "/placeholder.svg"}
@@ -34,7 +37,10 @@ export function ProductCard({ product, on_view, on_add_to_cart }: ProductCardPro
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <Button
             size="sm"
-            onClick={on_view}
+            onClick={(e) => {
+              e.stopPropagation()
+              on_view()
+            }}
             className="bg-white/20 backdrop-blur-lg border border-white/30 hover:bg-white/30 text-white rounded-full p-2"
           >
             <Eye className="h-3 w-3" />
@@ -88,7 +94,10 @@ export function ProductCard({ product, on_view, on_add_to_cart }: ProductCardPro
         </div>
 
         <Button
-          onClick={on_add_to_cart}
+          onClick={(e) => {
+            e.stopPropagation()
+            on_add_to_cart()
+          }}
           disabled={!product.in_stock}
           className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary-dark hover:to-secondary-dark text-white rounded-xl"
         >

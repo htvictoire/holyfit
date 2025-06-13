@@ -21,9 +21,12 @@ export function FeaturedProductCard({
   const is_large = index === 0
 
   return (
-    <div className={`group relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-lg border border-gray-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 ${
-      is_large ? 'lg:col-span-2 lg:row-span-2' : ''
-    }`}>
+    <div 
+      className={`group relative overflow-hidden rounded-3xl bg-white/60 backdrop-blur-lg border border-gray-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer ${
+        is_large ? 'lg:col-span-2 lg:row-span-2' : ''
+      }`}
+      onClick={on_view}
+    >
       <div className="relative aspect-square overflow-hidden">
         <img
           src={product.image}
@@ -53,7 +56,10 @@ export function FeaturedProductCard({
         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-2">
           <Button
             size="sm"
-            onClick={on_view}
+            onClick={(e) => {
+              e.stopPropagation()
+              on_view()
+            }}
             className="bg-white/20 backdrop-blur-lg border border-white/30 hover:bg-white/30 text-white rounded-full p-3"
           >
             <Eye className="h-4 w-4" />
@@ -103,7 +109,10 @@ export function FeaturedProductCard({
               </div>
               
               <Button
-                onClick={on_add_to_cart}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  on_add_to_cart()
+                }}
                 disabled={!product.in_stock}
                 size="sm"
                 className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 border-0 rounded-xl"

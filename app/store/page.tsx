@@ -52,11 +52,23 @@ const ProductCardSkeleton = () => (
   </div>
 )
 
-const categories = await fetchStoreData().then((data) => data.categories)
-
 export default function StorePage() {
-  const { filtered_products, filters, cart, selected_product, set_filters, toggle_cart, add_to_cart, apply_filters } =
-    useStoreState()
+  const { 
+    filtered_products, 
+    filters, 
+    cart, 
+    selected_product, 
+    is_product_modal_open,
+    set_filters, 
+    toggle_cart, 
+    add_to_cart, 
+    apply_filters,
+    initialize_store,
+    open_product_modal,
+    close_product_modal 
+  } = useStoreState()
+
+  const [categories, setCategories] = useState<any[]>([])
 
   const { toast } = useToast()
 
@@ -69,18 +81,30 @@ export default function StorePage() {
 
   // Initialize store
   useEffect(() => {
-    const timer = setTimeout(() => {
-      apply_filters()
-      set_loading(false)
-    }, 1000)
-
-    return () => clearTimeout(timer)
-  }, [apply_filters])
+    const initializeAsync = async () => {
+      try {
+        console.log("Initializing store...")
+        await initialize_store()
+        const data = await fetchStoreData()
+        console.log("Store data loaded:", data.products.length, "products")
+        setCategories(data.categories)
+        set_loading(false)
+      } catch (error) {
+        console.error("Failed to load store data:", error)
+        set_loading(false)
+      }
+    }
+    
+    initializeAsync()
+  }, [initialize_store])
 
   const handle_add_to_cart = (product: Product) => {
+    console.log("Add to cart clicked for product:", product.name)
     if (product.variants && product.variants.length > 0) {
-      useStoreState.setState({ selected_product: product })
+      console.log("Product has variants, opening modal")
+      open_product_modal(product)
     } else {
+      console.log("Adding product to cart directly")
       add_to_cart(product)
       toast({
         title: "Added to Cart! 🛒",
@@ -91,11 +115,12 @@ export default function StorePage() {
   }
 
   const handle_view_product = (product: Product) => {
-    useStoreState.setState({ selected_product: product })
+    console.log("View product clicked for:", product.name)
+    open_product_modal(product)
   }
 
   const handle_close_modal = () => {
-    useStoreState.setState({ selected_product: null })
+    close_product_modal()
   }
 
   const handle_search_change = (value: string) => {
@@ -445,23 +470,19 @@ export default function StorePage() {
                         {layout_mode === "featured" ? "Complete Collection" : "Browse All Products"}
                       </h2>
                       <p className="text-gray-600 mt-2 text-lg">
-                        {layout_mode === "featured"
-                          ? `${filtered_products.filter((p) => !useStoreState.getState().featured_products.some((fp) => fp.id === p.id)).length} additional products available`
-                          : `${filtered_products.length} premium products available`}
+                        {`${filtered_products.length} premium products available`}
                       </p>
                     </div>
                   </div>
 
                   {/* Main Products Section */}
                   <div className={cn("grid gap-8", grid_classes[view_mode])}>
+                    {console.log("Rendering products:", filtered_products.length)}
                     {filtered_products.map((product, index) => {
-                      // Only skip products that are actually shown in the featured section
-                      // This fixes the issue where products were being hidden incorrectly
-                      const { featured_products } = useStoreState.getState()
-                      const skip_in_featured =
-                        layout_mode === "featured" && featured_products.some((fp) => fp.id === product.id)
-
-                      if (skip_in_featured) return null
+                      // For featured layout, skip products that are already shown in featured section (top rated ones)
+                      if (layout_mode === "featured" && product.rating && product.rating >= 4.5 && index < 9) {
+                        return null;
+                      }
 
                       return (
                         <motion.div
@@ -693,14 +714,15 @@ export default function StorePage() {
 
             // Format cart items for WhatsApp
             const cartText = cart.items
-              .map((item) => `• ${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}`)
+              .map((item) => `• ${item.quantity}x ${item.product.name} - $${item.total_price.toFixed(2)}`)
               .join("%0A")
 
             const totalText = `%0A%0A*Total: $${cart.total.toFixed(2)}*`
             const message = `*My Holy Fit Order:*%0A%0A${cartText}${totalText}%0A%0APlease process my order. Thank you!`
 
             // Open WhatsApp with pre-filled message
-            window.open(`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}?text=${message}`, "_blank")
+            const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "1234567890"
+            window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank")
           }}
           className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-2xl flex items-center gap-2"
         >
@@ -729,7 +751,7 @@ export default function StorePage() {
       <CheckoutModal />
 
       {selected_product && (
-        <ProductModal product={selected_product} is_open={!!selected_product} on_close={handle_close_modal} />
+        <ProductModal product={selected_product} is_open={is_product_modal_open} on_close={handle_close_modal} />
       )}
     </div>
   )

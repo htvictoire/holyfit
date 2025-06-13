@@ -15,6 +15,8 @@ export interface Product {
     features?: string[]
     specifications?: Record<string, string>
     variants?: ProductVariant[]
+    brand?: string
+    created_at?: string
   }
   
   export interface ProductVariant {
@@ -46,9 +48,14 @@ export interface Product {
     items: CartItem[]
     total_items: number
     subtotal: number
+    discount?: number
     tax?: number
     shipping?: number
     total: number
+    coupon?: {
+      code: string
+      discount: number
+    } | null
   }
   
   export interface FilterState {
@@ -58,7 +65,10 @@ export interface Product {
       max: number
     }
     in_stock_only: boolean
-    sort_by: 'name' | 'price-low' | 'price-high' | 'rating' | 'newest'
+    rating_min?: number
+    brands?: string[]
+    tags?: string[]
+    sort_by: 'relevance' | 'price-low' | 'price-high' | 'rating' | 'newest' | 'popularity'
     search: string
   }
   
@@ -80,4 +90,18 @@ export interface Product {
     total: number
     status: 'pending' | 'confirmed' | 'processing' | 'shipped' | 'delivered'
     created_at: Date
+  }
+
+  export interface WishlistItem {
+    id: string
+    product_id: string
+    product: Product
+    added_at: string
+  }
+
+  export interface ComparisonItem {
+    id: string
+    product_id: string
+    product: Product
+    added_at: string
   }

@@ -30,12 +30,12 @@ export function ProductModal({ product, is_open, on_close }: ProductModalProps) 
   const images = product.images || [product.image]
 
   const calculate_price = () => {
-    let price = product.price
-    if (product.variants) {
+    let price = Number(product.price) || 0
+    if (product.variants && selected_variants) {
       for (const [variant_type, selected_value] of Object.entries(selected_variants)) {
         const variant = product.variants.find((v) => v.type === variant_type && v.value === selected_value)
         if (variant?.price_modifier) {
-          price += variant.price_modifier
+          price += Number(variant.price_modifier)
         }
       }
     }

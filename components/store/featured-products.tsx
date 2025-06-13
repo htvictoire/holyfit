@@ -10,19 +10,21 @@ interface FeaturedProductsProps {
 }
 
 export function FeaturedProducts({ products }: FeaturedProductsProps) {
-  const { add_to_cart } = useStoreState()
+  const { add_to_cart, open_product_modal } = useStoreState()
 
   const featured_products = products.filter((p) => p.rating && p.rating >= 4.5).slice(0, 9)
 
   if (featured_products.length === 0) return null
 
   const handle_view_product = (product: Product) => {
-    useStoreState.setState({ selected_product: product })
+    console.log("Featured product view clicked:", product.name)
+    open_product_modal(product)
   }
 
   const handle_add_to_cart = (product: Product) => {
+    console.log("Featured product add to cart clicked:", product.name)
     if (product.variants && product.variants.length > 0) {
-      handle_view_product(product)
+      open_product_modal(product)
     } else {
       add_to_cart(product)
     }

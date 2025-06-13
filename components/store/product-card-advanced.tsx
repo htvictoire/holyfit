@@ -34,11 +34,12 @@ export function ProductCardAdvanced({
     return (
       <Card
         className={cn(
-          "group relative overflow-hidden border-0 shadow-2xl hover:shadow-3xl transition-all duration-700 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900",
+          "group relative overflow-hidden border-0 shadow-2xl hover:shadow-3xl transition-all duration-700 bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 cursor-pointer",
           className,
         )}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        onClick={on_view}
       >
         <CardContent className="p-0 relative h-[500px]">
           <div className="absolute inset-0">
@@ -70,7 +71,10 @@ export function ProductCardAdvanced({
           <div className="absolute top-6 right-6 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500">
             <Button
               size="sm"
-              onClick={on_view}
+              onClick={(e) => {
+                e.stopPropagation()
+                on_view()
+              }}
               className="w-12 h-12 rounded-full bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white shadow-xl"
             >
               <Eye className="w-5 h-5" />
@@ -115,7 +119,10 @@ export function ProductCardAdvanced({
                   )}
                 </div>
                 <Button
-                  onClick={on_add_to_cart}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    on_add_to_cart()
+                  }}
                   size="lg"
                   className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-xl px-8 py-3 text-lg font-semibold"
                 >
@@ -181,7 +188,10 @@ export function ProductCardAdvanced({
             >
               <Button
                 size="sm"
-                onClick={on_view}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  on_view()
+                }}
                 className="w-10 h-10 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600 shadow-lg border-0"
               >
                 <Eye className="w-4 h-4" />
@@ -202,7 +212,10 @@ export function ProductCardAdvanced({
               )}
             >
               <Button
-                onClick={on_add_to_cart}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  on_add_to_cart()
+                }}
                 className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-xl"
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
@@ -267,11 +280,12 @@ export function ProductCardAdvanced({
   return (
     <Card
       className={cn(
-        "group relative overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 bg-white hover:-translate-y-2 h-full flex flex-col", // Add flex-col to enable proper content distribution
+        "group relative overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 bg-white hover:-translate-y-2 h-full flex flex-col cursor-pointer", // Add cursor-pointer
         className,
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={on_view}
     >
       <CardContent className="p-0 relative flex flex-col h-full">
         {" "}
@@ -318,7 +332,10 @@ export function ProductCardAdvanced({
           >
             <Button
               size="sm"
-              onClick={on_view}
+              onClick={(e) => {
+                e.stopPropagation()
+                on_view()
+              }}
               className="w-8 h-8 rounded-full bg-white/90 hover:bg-white text-gray-600 hover:text-blue-600 shadow-md border-0"
             >
               <Eye className="w-3 h-3" />
@@ -383,7 +400,10 @@ export function ProductCardAdvanced({
             </div>
           </div>
           <Button
-            onClick={on_add_to_cart}
+            onClick={(e) => {
+              e.stopPropagation()
+              on_add_to_cart()
+            }}
             disabled={!product.in_stock}
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg shadow-md transition-all duration-300 mt-auto"
           >
