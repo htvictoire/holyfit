@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import { Menu, X, Dumbbell, Flame, Heart, Award, BookOpen, HelpCircle, Mail } from "lucide-react"
+import { Menu, X, Dumbbell, Flame, Heart, Award, BookOpen, HelpCircle, Mail, ShoppingCart } from "lucide-react"
 import { motion, AnimatePresence, useScroll } from "framer-motion"
 
 export default function Navigation() {
@@ -63,6 +63,7 @@ export default function Navigation() {
     { name: "Contact", href: "#contact-us", icon: <Mail className="h-4 w-4" /> },
     { name: "FAQ", href: "#faq", icon: <HelpCircle className="h-4 w-4" /> },
     { name: "Blog", href: "/blog",},
+    { name: "Our Store", href: "/store", icon: <ShoppingCart className="h-4 w-4" /> }
   ]
 
   // Animation variants

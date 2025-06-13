@@ -32,8 +32,8 @@ import { StoreHeader } from "@/components/store/store-header"
 import { ProductCardAdvanced } from "@/components/store/product-card-advanced"
 import { FeaturedProducts } from "@/components/store/featured-products"
 import { CartModal } from "@/components/store/cart-modal"
-import { CheckoutModal } from "@/components/store/checkout-modal"
-import { ProductModal } from "@/components/store/product-modal"
+import { CheckoutModalNew } from "@/components/store/checkout-modal-new"
+import { ProductModalNew } from "@/components/store/product-modal-new"
 import { EmptyState } from "@/components/store/empty-state"
 import { useToast } from "@/hooks/use-toast"
 import { cn } from "@/lib/utils"
@@ -73,7 +73,7 @@ export default function StorePage() {
   const { toast } = useToast()
 
   const [price_range, set_price_range] = useState([0, 1000])
-  const [view_mode, set_view_mode] = useState<"grid" | "list" | "compact">("grid")
+  const [view_mode, set_view_mode] = useState<"grid" | "list">("grid")
   const [layout_mode, set_layout_mode] = useState<"featured" | "standard">("featured")
   const [show_filters, set_show_filters] = useState(false)
   const [loading, set_loading] = useState(true)
@@ -125,6 +125,11 @@ export default function StorePage() {
 
   const handle_search_change = (value: string) => {
     set_filters({ search: value })
+    // Auto-switch to 'all' mode and list view when search is active
+    if (value.trim() && layout_mode === "featured") {
+      set_layout_mode("standard")
+      set_view_mode("list")
+    }
   }
 
   const handle_price_range_change = (value: number[]) => {
@@ -170,7 +175,6 @@ export default function StorePage() {
 
   const grid_classes = {
     grid: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-    compact: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6",
     list: "grid-cols-1",
   }
 
@@ -250,12 +254,19 @@ export default function StorePage() {
               {/* Category Filter */}
               <Select
                 value={filters.category || "all"}
-                onValueChange={(value) => set_filters({ category: value === "all" ? undefined : value })}
+                onValueChange={(value) => {
+                  set_filters({ category: value === "all" ? undefined : value })
+                  // Auto-switch to 'all' mode and list view when category filter is active
+                  if (value !== "all" && layout_mode === "featured") {
+                    set_layout_mode("standard")
+                    set_view_mode("list")
+                  }
+                }}
               >
-                <SelectTrigger className="h-12 min-w-48 border-gray-300 rounded-xl">
+                <SelectTrigger className="h-12 min-w-48 border-gray-300 rounded-xl bg-white">
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg">
                   <SelectItem value="all">All Categories</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id}>
@@ -279,14 +290,6 @@ export default function StorePage() {
                   className="w-10 h-10 p-0 rounded-lg"
                 >
                   <LayoutGrid className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={view_mode === "compact" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => set_view_mode("compact")}
-                  className="w-10 h-10 p-0 rounded-lg"
-                >
-                  <Grid3X3 className="w-4 h-4" />
                 </Button>
                 <Button
                   variant={view_mode === "list" ? "default" : "ghost"}
@@ -396,7 +399,14 @@ export default function StorePage() {
                         <Checkbox
                           id="in_stock"
                           checked={filters.in_stock_only}
-                          onCheckedChange={(checked) => set_filters({ in_stock_only: !!checked })}
+                          onCheckedChange={(checked) => {
+                            set_filters({ in_stock_only: !!checked })
+                            // Auto-switch to 'all' mode and list view when stock filter is active
+                            if (checked && layout_mode === "featured") {
+                              set_layout_mode("standard")
+                              set_view_mode("list")
+                            }
+                          }}
                         />
                       </div>
 
@@ -478,30 +488,34 @@ export default function StorePage() {
                   {/* Main Products Section */}
                   <div className={cn("grid gap-8", grid_classes[view_mode])}>
                     {console.log("Rendering products:", filtered_products.length)}
-                    {filtered_products.map((product, index) => {
-                      // For featured layout, skip products that are already shown in featured section (top rated ones)
-                      if (layout_mode === "featured" && product.rating && product.rating >= 4.5 && index < 9) {
-                        return null;
+                    {(() => {
+                      let products_to_render = filtered_products;
+                      
+                      // For featured layout, reorder products: non-featured first, then featured at the end
+                      if (layout_mode === "featured") {
+                        const featured_products = filtered_products.filter(p => p.rating && p.rating >= 4.5);
+                        const non_featured_products = filtered_products.filter(p => !p.rating || p.rating < 4.5);
+                        products_to_render = [...non_featured_products, ...featured_products];
                       }
 
-                      return (
+                      return products_to_render.map((product, index) => (
                         <motion.div
                           key={product.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="h-full" // Add height constraint to ensure consistent sizing
+                          className="h-full"
                         >
                           <ProductCardAdvanced
                             product={product}
-                            variant={view_mode === "compact" ? "compact" : "default"}
+                            variant={view_mode === "list" ? "list" : "default"}
                             on_view={() => handle_view_product(product)}
                             on_add_to_cart={() => handle_add_to_cart(product)}
-                            className="h-full" // Ensure card takes full height of container
+                            className="h-full"
                           />
                         </motion.div>
-                      )
-                    })}
+                      ));
+                    })()}
                   </div>
                 </motion.section>
 
@@ -549,7 +563,7 @@ export default function StorePage() {
                 </motion.section>
 
                 {/* Footer Section */}
-                <motion.footer
+                {/* <motion.footer
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.0 }}
@@ -692,7 +706,7 @@ export default function StorePage() {
                   <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
                     <p>&copy; 2024 Holy Fit. All rights reserved. | Privacy Policy | Terms of Service</p>
                   </div>
-                </motion.footer>
+                </motion.footer> */}
               </div>
             )}
           </div>
@@ -748,10 +762,10 @@ export default function StorePage() {
 
       {/* Modals */}
       <CartModal />
-      <CheckoutModal />
+      <CheckoutModalNew />
 
       {selected_product && (
-        <ProductModal product={selected_product} is_open={is_product_modal_open} on_close={handle_close_modal} />
+        <ProductModalNew product={selected_product} is_open={is_product_modal_open} on_close={handle_close_modal} />
       )}
     </div>
   )

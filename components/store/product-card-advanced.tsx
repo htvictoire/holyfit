@@ -10,7 +10,7 @@ import type { Product } from "@/types/store-types"
 
 interface ProductCardAdvancedProps {
   product: Product
-  variant?: "default" | "featured" | "compact" | "hero"
+  variant?: "default" | "featured" | "compact" | "hero" | "list"
   on_view: () => void
   on_add_to_cart: () => void
   className?: string
@@ -269,6 +269,139 @@ export function ProductCardAdvanced({
                   <span className="text-sm font-medium text-green-600">In Stock</span>
                 </div>
               )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (variant === "list") {
+    return (
+      <Card
+        className={cn(
+          "group relative overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-all duration-500 bg-white hover:-translate-y-1 cursor-pointer",
+          className,
+        )}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={on_view}
+      >
+        <CardContent className="p-0 relative">
+          <div className="flex">
+            {/* Image Section */}
+            <div className="w-48 flex-shrink-0 relative">
+              <div className="aspect-square overflow-hidden">
+                <img
+                  src={product.image || "/placeholder.svg?height=300&width=300"}
+                  alt={product.name}
+                  className={cn(
+                    "w-full h-full object-cover transition-all duration-500",
+                    isHovered ? "scale-105" : "scale-100",
+                  )}
+                />
+              </div>
+
+              {/* Badges */}
+              <div className="absolute top-3 left-3 flex flex-col gap-2">
+                {discount > 0 && (
+                  <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white border-0 shadow-md text-xs font-bold">
+                    -{discount}%
+                  </Badge>
+                )}
+                {product.rating && product.rating >= 4.5 && (
+                  <Badge className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white border-0 shadow-md text-xs">
+                    <Star className="w-2 h-2 mr-1 fill-current" />
+                    TOP
+                  </Badge>
+                )}
+              </div>
+
+              {!product.in_stock && (
+                <div className="absolute inset-0 bg-gray-900/60 flex items-center justify-center">
+                  <Badge variant="secondary" className="text-sm bg-white/90 text-gray-800">
+                    Out of Stock
+                  </Badge>
+                </div>
+              )}
+            </div>
+
+            {/* Content Section */}
+            <div className="flex-1 p-6 flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between">
+                  <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                    {product.category.name}
+                  </Badge>
+                  {product.in_stock && (
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-medium text-green-600">In Stock</span>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                    {product.name}
+                  </h3>
+                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{product.description}</p>
+                </div>
+
+                {product.rating && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center bg-yellow-50 rounded-lg px-2 py-1">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <Star
+                          key={i}
+                          className={cn(
+                            "w-4 h-4",
+                            i < Math.floor(product.rating!) ? "text-yellow-400 fill-current" : "text-gray-300",
+                          )}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-medium text-gray-700">
+                      {product.rating} ({product.review_count} reviews)
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Price and Actions */}
+              <div className="flex items-center justify-between pt-4">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-gray-800">${product.price}</span>
+                  {product.original_price && (
+                    <span className="text-lg text-gray-500 line-through">${product.original_price}</span>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      on_view()
+                    }}
+                    className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 shadow-sm"
+                  >
+                    <Eye className="w-4 h-4 mr-2" />
+                    View
+                  </Button>
+                  <Button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      on_add_to_cart()
+                    }}
+                    disabled={!product.in_stock}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md px-6"
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-2" />
+                    Add to Cart
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>
