@@ -59,7 +59,7 @@ export function CartModal() {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-              <h2 className="text-lg font-bold text-gray-800">Shopping Cart</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-800">Shopping Cart</h2>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 hidden sm:inline">
                   {cart.total_items} {cart.total_items === 1 ? 'item' : 'items'}

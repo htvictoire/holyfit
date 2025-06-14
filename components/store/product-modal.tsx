@@ -147,7 +147,7 @@ export function ProductModal({ product, is_open, on_close }: ProductModalProps) 
                 <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-2 py-1 text-sm flex-shrink-0">
                   {product.category.name}
                 </Badge>
-                <h2 className="text-lg font-bold text-gray-800 truncate">{product.name}</h2>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-800 truncate">{product.name}</h2>
               </div>
               <Button
                 onClick={on_close}
