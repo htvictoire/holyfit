@@ -371,20 +371,20 @@ export function ProductCardAdvanced({
               {/* Price and Actions */}
               <div className="flex items-center justify-between pt-2 sm:pt-4">
                 <div className="flex flex-col">
-                  <span className="text-lg sm:text-2xl font-bold text-gray-800">${product.price}</span>
+                  <span className="text-base sm:text-2xl font-bold text-gray-800">${product.price}</span>
                   {product.original_price && (
-                    <span className="text-sm sm:text-lg text-gray-500 line-through">${product.original_price}</span>
+                    <span className="text-xs sm:text-lg text-gray-500 line-through">${product.original_price}</span>
                   )}
                 </div>
 
-                <div className="flex flex-col gap-1 sm:flex-row sm:gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation()
                       on_view()
                     }}
-                    className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 shadow-sm text-xs sm:text-sm"
+                    className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 shadow-sm w-8 h-8 sm:w-auto sm:h-auto p-0 sm:px-3 sm:py-2"
                   >
                     <Eye className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
                     <span className="hidden sm:inline">View</span>
@@ -395,7 +395,7 @@ export function ProductCardAdvanced({
                       on_add_to_cart()
                     }}
                     disabled={!product.in_stock}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md text-xs sm:text-sm px-2 sm:px-6"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md w-8 h-8 sm:w-auto sm:h-auto p-0 sm:px-6 sm:py-2"
                   >
                     <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
                     <span className="hidden sm:inline">Add to Cart</span>
