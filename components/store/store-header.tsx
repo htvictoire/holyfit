@@ -20,47 +20,47 @@ export function StoreHeader({ total_items, total_amount, on_cart_click }: StoreH
         }}
       />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex flex-col lg:flex-row items-center justify-between">
           <div className="lg:w-1/2 mb-8 lg:mb-0 text-center lg:text-left">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-white mb-4 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight">
               Elite
               <span className="bg-gradient-to-r from-accent to-white bg-clip-text text-transparent"> Gear</span>
             </h1>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-100 mb-6 leading-relaxed max-w-md mx-auto lg:mx-0">
+            <p className="text-lg sm:text-xl text-gray-100 mb-6 leading-relaxed max-w-md mx-auto lg:mx-0">
               Premium fitness equipment and supplements for athletes who demand excellence
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-3 sm:space-y-0 sm:space-x-6">
-              <Badge className="bg-white/20 text-white border-white/30 px-3 sm:px-4 py-2 text-sm">
-                <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+              <Badge className="bg-white/20 text-white border-white/30 px-4 py-2">
+                <Award className="h-4 w-4 mr-2" />
                 Premium Quality
               </Badge>
-              <Badge className="bg-white/20 text-white border-white/30 px-3 sm:px-4 py-2 text-sm">
-                <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
+              <Badge className="bg-white/20 text-white border-white/30 px-4 py-2">
+                <TrendingUp className="h-4 w-4 mr-2" />
                 Fast Results
               </Badge>
             </div>
           </div>
 
-          <div className="lg:w-1/2 relative w-full max-w-sm lg:max-w-none">
+          <div className="lg:w-1/2 relative">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-accent to-white rounded-2xl sm:rounded-3xl blur-2xl sm:blur-3xl opacity-30 animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-accent to-white rounded-3xl blur-3xl opacity-30 animate-pulse" />
               <Button
                 onClick={on_cart_click}
-                className="relative bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 text-white transition-all duration-300 h-16 sm:h-20 px-6 sm:px-8 rounded-xl sm:rounded-2xl group w-full"
+                className="relative bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 text-white transition-all duration-300 h-16 sm:h-20 px-6 sm:px-8 rounded-2xl group"
               >
-                <div className="flex items-center justify-center space-x-3 sm:space-x-4">
+                <div className="flex items-center space-x-4">
                   <div className="relative">
-                    <ShoppingCart className="h-6 w-6 sm:h-8 sm:w-8" />
+                    <ShoppingCart className="h-8 w-8" />
                     {total_items > 0 && (
-                      <div className="absolute -top-2 -right-2 bg-gradient-to-r from-accent to-accent-light text-accent-foreground rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs sm:text-sm font-bold animate-bounce">
+                      <div className="absolute -top-2 -right-2 bg-gradient-to-r from-accent to-accent-light text-accent-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold animate-bounce">
                         {total_items}
                       </div>
                     )}
                   </div>
                   <div className="text-left">
-                    <div className="text-xs sm:text-sm opacity-80">Your Cart</div>
-                    <div className="text-lg sm:text-xl font-bold">${total_amount.toFixed(2)}</div>
+                    <div className="text-sm opacity-80">Your Cart</div>
+                    <div className="text-xl font-bold">${total_amount.toFixed(2)}</div>
                   </div>
                 </div>
               </Button>

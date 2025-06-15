@@ -36,7 +36,6 @@ import { CheckoutModalNew } from "@/components/store/checkout-modal-new"
 import { ProductModalNew } from "@/components/store/product-modal-new"
 import { EmptyState } from "@/components/store/empty-state"
 import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
 import type { Product } from "@/types/store-types"
 import { fetchStoreData } from "@/services/store-service"
 
@@ -173,9 +172,9 @@ export default function StorePage() {
     [filtered_products],
   )
 
-  const grid_classes = {
-    grid: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
-    list: "grid-cols-1",
+  const layout_classes = {
+    grid: "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8",
+    list: "flex flex-col gap-6",
   }
 
   if (loading) {
@@ -204,7 +203,137 @@ export default function StorePage() {
         className="sticky top-0 z-50 bg-white/95 backdrop-blur-xl border-b border-gray-200/50 shadow-lg"
       >
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <div className="flex flex-col lg:flex-row items-center gap-6">
+          {/* Mobile Layout */}
+          <div className="lg:hidden space-y-4">
+            {/* Search Bar */}
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Input
+                placeholder="Search fitness products..."
+                value={filters.search}
+                onChange={(e) => handle_search_change(e.target.value)}
+                className="pl-12 pr-12 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-xl text-base shadow-sm w-full"
+              />
+              {filters.search && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handle_search_change("")}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+
+            {/* Category and Filters Row */}
+            <div className="grid grid-cols-2 gap-3">
+              <Select
+                value={filters.category || "all"}
+                onValueChange={(value) => {
+                  set_filters({ category: value === "all" ? undefined : value })
+                  if (value !== "all" && layout_mode === "featured") {
+                    set_layout_mode("standard")
+                    set_view_mode("list")
+                  }
+                }}
+              >
+                <SelectTrigger className="h-11 border-gray-300 rounded-xl bg-white">
+                  <SelectValue placeholder="Category" />
+                </SelectTrigger>
+                <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="outline"
+                onClick={() => set_show_filters(!show_filters)}
+                className="h-11 border-gray-300 hover:bg-gray-50 rounded-xl"
+              >
+                <SlidersHorizontal className="w-4 h-4 mr-2" />
+                Filters
+              </Button>
+            </div>
+
+            {/* Layout and View Mode Toggles */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+                <Button
+                  variant={layout_mode === "featured" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => set_layout_mode("featured")}
+                  className="flex-1 rounded-lg h-9 text-xs"
+                >
+                  <Sparkles className="w-3 h-3 mr-1" />
+                  Featured
+                </Button>
+                <Button
+                  variant={layout_mode === "standard" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => set_layout_mode("standard")}
+                  className="flex-1 rounded-lg h-9 text-xs"
+                >
+                  <LayoutGrid className="w-3 h-3 mr-1" />
+                  All
+                </Button>
+              </div>
+
+              <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+                <Button
+                  variant={view_mode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => set_view_mode("grid")}
+                  className="flex-1 rounded-lg h-9 text-xs"
+                >
+                  <LayoutGrid className="w-3 h-3 mr-1" />
+                  Grid
+                </Button>
+                <Button
+                  variant={view_mode === "list" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => set_view_mode("list")}
+                  className="flex-1 rounded-lg h-9 text-xs"
+                >
+                  <List className="w-3 h-3 mr-1" />
+                  List
+                </Button>
+              </div>
+            </div>
+
+            {/* Cart Button */}
+            <Button
+              onClick={toggle_cart}
+              className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 rounded-xl shadow-lg w-full"
+            >
+              <div className="flex items-center justify-center gap-3">
+                <div className="relative">
+                  <ShoppingCart className="w-5 h-5" />
+                  {cart.total_items > 0 && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
+                    >
+                      {cart.total_items}
+                    </motion.div>
+                  )}
+                </div>
+                <div className="text-center">
+                  <div className="text-sm font-semibold">Cart: ${cart.total.toFixed(2)}</div>
+                  <div className="text-xs opacity-90">{cart.total_items} items</div>
+                </div>
+              </div>
+            </Button>
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden lg:flex items-center gap-6">
             {/* Advanced Search */}
             <div className="flex-1 relative">
               <div className="relative">
@@ -358,13 +487,37 @@ export default function StorePage() {
           {/* Advanced Sidebar */}
           <AnimatePresence>
             {show_filters && (
-              <motion.div
-                initial={{ x: -300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-                className="w-80 flex-shrink-0"
-              >
-                <div className="sticky top-32 space-y-8">
+              <>
+                {/* Mobile Backdrop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => set_show_filters(false)}
+                  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
+                />
+                
+                {/* Sidebar */}
+                <motion.div
+                  initial={{ x: -300, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -300, opacity: 0 }}
+                  className="w-80 flex-shrink-0 lg:relative fixed top-0 left-0 h-full bg-white z-50 lg:z-auto lg:h-auto overflow-y-auto"
+                >
+                <div className="lg:sticky lg:top-32 space-y-8 p-4 lg:p-0">
+                  {/* Mobile Close Button */}
+                  <div className="lg:hidden flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-bold text-gray-800">Filters & Insights</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => set_show_filters(false)}
+                      className="w-8 h-8 p-0 rounded-full hover:bg-gray-100"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+
                   {/* Advanced Filters Card */}
                   <Card className="bg-white/80 backdrop-blur-lg border border-gray-200/50 shadow-xl">
                     <CardHeader>
@@ -452,7 +605,8 @@ export default function StorePage() {
                     </CardContent>
                   </Card>
                 </div>
-              </motion.div>
+                </motion.div>
+              </>
             )}
           </AnimatePresence>
 
@@ -486,7 +640,7 @@ export default function StorePage() {
                   </div>
 
                   {/* Main Products Section */}
-                  <div className={cn("grid gap-8", grid_classes[view_mode])}>
+                  <div className={layout_classes[view_mode]}>
                     {console.log("Rendering products:", filtered_products.length)}
                     {(() => {
                       let products_to_render = filtered_products;
@@ -504,14 +658,14 @@ export default function StorePage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="h-full"
+                          className={view_mode === "grid" ? "h-full" : ""}
                         >
                           <ProductCardAdvanced
                             product={product}
                             variant={view_mode === "list" ? "list" : "default"}
                             on_view={() => handle_view_product(product)}
                             on_add_to_cart={() => handle_add_to_cart(product)}
-                            className="h-full"
+                            className={view_mode === "grid" ? "h-full" : ""}
                           />
                         </motion.div>
                       ));

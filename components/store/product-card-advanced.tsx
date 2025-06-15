@@ -290,7 +290,7 @@ export function ProductCardAdvanced({
         <CardContent className="p-0 relative">
           <div className="flex">
             {/* Image Section */}
-            <div className="w-48 flex-shrink-0 relative">
+            <div className="w-32 sm:w-48 flex-shrink-0 relative">
               <div className="aspect-square overflow-hidden">
                 <img
                   src={product.image || "/placeholder.svg?height=300&width=300"}
@@ -327,29 +327,29 @@ export function ProductCardAdvanced({
             </div>
 
             {/* Content Section */}
-            <div className="flex-1 p-6 flex flex-col justify-between">
-              <div className="space-y-4">
+            <div className="flex-1 p-3 sm:p-6 flex flex-col justify-between">
+              <div className="space-y-2 sm:space-y-4">
                 <div className="flex items-start justify-between">
                   <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
                     {product.category.name}
                   </Badge>
                   {product.in_stock && (
-                    <div className="flex items-center gap-1">
+                    <div className="hidden sm:flex items-center gap-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium text-green-600">In Stock</span>
+                      <span className="text-xs sm:text-sm font-medium text-green-600">In Stock</span>
                     </div>
                   )}
                 </div>
 
                 <div>
-                  <h3 className="font-bold text-xl text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-sm sm:text-xl text-gray-800 mb-1 sm:mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
                     {product.name}
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">{product.description}</p>
+                  <p className="text-gray-600 text-xs sm:text-sm leading-relaxed line-clamp-2 hidden sm:block">{product.description}</p>
                 </div>
 
                 {product.rating && (
-                  <div className="flex items-center gap-2">
+                  <div className="hidden sm:flex items-center gap-2">
                     <div className="flex items-center bg-yellow-50 rounded-lg px-2 py-1">
                       {Array.from({ length: 5 }, (_, i) => (
                         <Star
@@ -369,25 +369,25 @@ export function ProductCardAdvanced({
               </div>
 
               {/* Price and Actions */}
-              <div className="flex items-center justify-between pt-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-gray-800">${product.price}</span>
+              <div className="flex items-center justify-between pt-2 sm:pt-4">
+                <div className="flex flex-col">
+                  <span className="text-lg sm:text-2xl font-bold text-gray-800">${product.price}</span>
                   {product.original_price && (
-                    <span className="text-lg text-gray-500 line-through">${product.original_price}</span>
+                    <span className="text-sm sm:text-lg text-gray-500 line-through">${product.original_price}</span>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-1 sm:flex-row sm:gap-2">
                   <Button
                     size="sm"
                     onClick={(e) => {
                       e.stopPropagation()
                       on_view()
                     }}
-                    className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 shadow-sm"
+                    className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 shadow-sm text-xs sm:text-sm"
                   >
-                    <Eye className="w-4 h-4 mr-2" />
-                    View
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">View</span>
                   </Button>
                   <Button
                     onClick={(e) => {
@@ -395,10 +395,10 @@ export function ProductCardAdvanced({
                       on_add_to_cart()
                     }}
                     disabled={!product.in_stock}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md px-6"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-md text-xs sm:text-sm px-2 sm:px-6"
                   >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Add to Cart
+                    <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">Add to Cart</span>
                   </Button>
                 </div>
               </div>
