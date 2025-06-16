@@ -93,7 +93,7 @@ ${order_summary}
 ${data.notes ? `Notes: ${data.notes}` : ""}
         `.trim()
 
-        const whatsapp_number = "1234567890"
+        const whatsapp_number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
         const whatsapp_url = `https://wa.me/${whatsapp_number}?text=${encodeURIComponent(message)}`
         window.open(whatsapp_url, "_blank")
       } else {

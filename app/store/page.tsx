@@ -77,6 +77,7 @@ export default function StorePage() {
   const [show_filters, set_show_filters] = useState(false)
   const [loading, set_loading] = useState(true)
   const [filter_loading, set_filter_loading] = useState(false)
+  const [show_mobile_search, setShowMobileSearch] = useState(false)
 
   // Initialize store
   useEffect(() => {
@@ -204,132 +205,91 @@ export default function StorePage() {
       >
         <div className="max-w-7xl mx-auto px-4 py-6">
           {/* Mobile Layout */}
-          <div className="lg:hidden space-y-4">
-            {/* Search Bar */}
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <Input
-                placeholder="Search fitness products..."
-                value={filters.search}
-                onChange={(e) => handle_search_change(e.target.value)}
-                className="pl-12 pr-12 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-xl text-base shadow-sm w-full"
-              />
-              {filters.search && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => handle_search_change("")}
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 rounded-full"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              )}
-            </div>
+          <div className="lg:hidden">
+            {/* Mobile Header - Single Row */}
+            <div className="flex items-center gap-3">
+              {/* Search Icon - Expandable */}
+              <div className="flex-1">
+                {!show_mobile_search ? (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowMobileSearch(true)}
+                    className="w-full h-12 border-gray-300 hover:bg-gray-50 rounded-xl justify-start"
+                  >
+                    <Search className="w-5 h-5 mr-2 text-gray-400" />
+                    <span className="text-gray-500">Search...</span>
+                  </Button>
+                ) : (
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                    <Input
+                      placeholder="Search fitness products..."
+                      value={filters.search}
+                      onChange={(e) => handle_search_change(e.target.value)}
+                      className="pl-12 pr-20 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-xl text-base shadow-sm w-full"
+                      autoFocus
+                    />
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => {
+                        setShowMobileSearch(false)
+                        // Optional: Keep search active after search
+                      }}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-3 rounded-lg text-xs"
+                    >
+                      Search
+                    </Button>
+                  </div>
+                )}
+              </div>
 
-            {/* Category and Filters Row */}
-            <div className="grid grid-cols-2 gap-3">
-              <Select
-                value={filters.category || "all"}
-                onValueChange={(value) => {
-                  set_filters({ category: value === "all" ? undefined : value })
-                  if (value !== "all" && layout_mode === "featured") {
-                    set_layout_mode("standard")
-                    set_view_mode("list")
-                  }
-                }}
-              >
-                <SelectTrigger className="h-11 border-gray-300 rounded-xl bg-white">
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                  <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category.id} value={category.id}>
-                      {category.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
+              {/* Filters Button */}
               <Button
                 variant="outline"
                 onClick={() => set_show_filters(!show_filters)}
-                className="h-11 border-gray-300 hover:bg-gray-50 rounded-xl"
+                className="h-12 px-4 border-gray-300 hover:bg-gray-50 rounded-xl flex-shrink-0"
               >
                 <SlidersHorizontal className="w-4 h-4 mr-2" />
                 Filters
+                {Object.values(filters).some(
+                  (v) => v && v !== "" && JSON.stringify(v) !== JSON.stringify({ min: 0, max: 1000 }),
+                ) && (
+                  <Badge className="ml-2 bg-purple-600 text-white">
+                    {
+                      Object.values(filters).filter(
+                        (v) => v && v !== "" && JSON.stringify(v) !== JSON.stringify({ min: 0, max: 1000 }),
+                      ).length
+                    }
+                  </Badge>
+                )}
+              </Button>
+
+              {/* Cart Button */}
+              <Button
+                onClick={toggle_cart}
+                className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 px-4 rounded-xl shadow-lg flex-shrink-0"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <ShoppingCart className="w-5 h-5" />
+                    {cart.total_items > 0 && (
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
+                      >
+                        {cart.total_items}
+                      </motion.div>
+                    )}
+                  </div>
+                  <div className="text-left">
+                    <div className="text-sm font-semibold">${cart.total.toFixed(2)}</div>
+                    <div className="text-xs opacity-90">{cart.total_items} items</div>
+                  </div>
+                </div>
               </Button>
             </div>
-
-            {/* Layout and View Mode Toggles */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-                <Button
-                  variant={layout_mode === "featured" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => set_layout_mode("featured")}
-                  className="flex-1 rounded-lg h-9 text-xs"
-                >
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Featured
-                </Button>
-                <Button
-                  variant={layout_mode === "standard" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => set_layout_mode("standard")}
-                  className="flex-1 rounded-lg h-9 text-xs"
-                >
-                  <LayoutGrid className="w-3 h-3 mr-1" />
-                  All
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-                <Button
-                  variant={view_mode === "grid" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => set_view_mode("grid")}
-                  className="flex-1 rounded-lg h-9 text-xs"
-                >
-                  <LayoutGrid className="w-3 h-3 mr-1" />
-                  Grid
-                </Button>
-                <Button
-                  variant={view_mode === "list" ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => set_view_mode("list")}
-                  className="flex-1 rounded-lg h-9 text-xs"
-                >
-                  <List className="w-3 h-3 mr-1" />
-                  List
-                </Button>
-              </div>
-            </div>
-
-            {/* Cart Button */}
-            <Button
-              onClick={toggle_cart}
-              className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 rounded-xl shadow-lg w-full"
-            >
-              <div className="flex items-center justify-center gap-3">
-                <div className="relative">
-                  <ShoppingCart className="w-5 h-5" />
-                  {cart.total_items > 0 && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
-                    >
-                      {cart.total_items}
-                    </motion.div>
-                  )}
-                </div>
-                <div className="text-center">
-                  <div className="text-sm font-semibold">Cart: ${cart.total.toFixed(2)}</div>
-                  <div className="text-xs opacity-90">{cart.total_items} items</div>
-                </div>
-              </div>
-            </Button>
           </div>
 
           {/* Desktop Layout */}
@@ -527,6 +487,93 @@ export default function StorePage() {
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-8">
+                      {/* Mobile Only: Category Selector */}
+                      <div className="lg:hidden">
+                        <label className="text-sm font-semibold mb-3 block text-gray-700">
+                          Category
+                        </label>
+                        <Select
+                          value={filters.category || "all"}
+                          onValueChange={(value) => {
+                            set_filters({ category: value === "all" ? undefined : value })
+                            if (value !== "all" && layout_mode === "featured") {
+                              set_layout_mode("standard")
+                              set_view_mode("list")
+                            }
+                          }}
+                        >
+                          <SelectTrigger className="h-11 border-gray-300 rounded-xl bg-white">
+                            <SelectValue placeholder="All Categories" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                            <SelectItem value="all">All Categories</SelectItem>
+                            {categories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* Mobile Only: Layout Mode Toggle */}
+                      <div className="lg:hidden">
+                        <label className="text-sm font-semibold mb-3 block text-gray-700">
+                          Layout Mode
+                        </label>
+                        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+                          <Button
+                            variant={layout_mode === "featured" ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => set_layout_mode("featured")}
+                            className="flex-1 rounded-lg h-10 text-sm"
+                          >
+                            <Sparkles className="w-4 h-4 mr-2" />
+                            Featured
+                          </Button>
+                          <Button
+                            variant={layout_mode === "standard" ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => set_layout_mode("standard")}
+                            className="flex-1 rounded-lg h-10 text-sm"
+                          >
+                            <LayoutGrid className="w-4 h-4 mr-2" />
+                            All
+                          </Button>
+                        </div>
+                      </div>
+
+                      {/* Mobile Only: View Mode Toggle */}
+                      <div className="lg:hidden">
+                        <label className="text-sm font-semibold mb-3 block text-gray-700">
+                          View Mode
+                        </label>
+                        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
+                          <Button
+                            variant={view_mode === "grid" ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => set_view_mode("grid")}
+                            className="flex-1 rounded-lg h-10 text-sm"
+                          >
+                            <LayoutGrid className="w-4 h-4 mr-2" />
+                            Grid
+                          </Button>
+                          <Button
+                            variant={view_mode === "list" ? "default" : "ghost"}
+                            size="sm"
+                            onClick={() => set_view_mode("list")}
+                            className="flex-1 rounded-lg h-10 text-sm"
+                          >
+                            <List className="w-4 h-4 mr-2" />
+                            List
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="lg:hidden">
+                        <Separator />
+                      </div>
+
                       {/* Price Range */}
                       <div>
                         <label className="text-sm font-semibold mb-4 block text-gray-700">
@@ -868,7 +915,7 @@ export default function StorePage() {
       </div>
 
       {/* WhatsApp Checkout Button */}
-      <div className="fixed bottom-8 right-8 z-50">
+      {/* <div className="fixed bottom-8 right-8 z-50">
         <Button
           onClick={() => {
             if (cart.items.length === 0) {
@@ -889,7 +936,7 @@ export default function StorePage() {
             const message = `*My Holy Fit Order:*%0A%0A${cartText}${totalText}%0A%0APlease process my order. Thank you!`
 
             // Open WhatsApp with pre-filled message
-            const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "1234567890"
+            const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
             window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank")
           }}
           className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-2xl flex items-center gap-2"
@@ -912,7 +959,7 @@ export default function StorePage() {
           </svg>
           Checkout via WhatsApp
         </Button>
-      </div>
+      </div> */}
 
       {/* Modals */}
       <CartModal />
