@@ -52,15 +52,15 @@ export function StoreHeader({ total_items, total_amount, on_cart_click }: StoreH
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     <ShoppingCart className="h-8 w-8" />
-                    {total_items > 0 && (
+                    {(Number(total_items) || 0) > 0 && (
                       <div className="absolute -top-2 -right-2 bg-gradient-to-r from-accent to-accent-light text-accent-foreground rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold animate-bounce">
-                        {total_items}
+                        {Number(total_items) || 0}
                       </div>
                     )}
                   </div>
                   <div className="text-left">
                     <div className="text-sm opacity-80">Your Cart</div>
-                    <div className="text-xl font-bold">${total_amount.toFixed(2)}</div>
+                    <div className="text-xl font-bold">${(Number(total_amount) || 0).toFixed(2)}</div>
                   </div>
                 </div>
               </Button>

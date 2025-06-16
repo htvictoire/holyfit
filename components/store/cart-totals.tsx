@@ -17,7 +17,7 @@ export function CartTotals({ cart, on_continue_shopping, on_checkout }: CartTota
       <div className="bg-gray-50 rounded-lg p-4 space-y-3">
         <div className="flex justify-between text-gray-600">
           <span>Subtotal</span>
-          <span className="font-semibold">${cart.subtotal.toFixed(2)}</span>
+          <span className="font-semibold">${(Number(cart.subtotal) || 0).toFixed(2)}</span>
         </div>
 
         <div className="flex justify-between text-gray-600">
@@ -36,10 +36,10 @@ export function CartTotals({ cart, on_continue_shopping, on_checkout }: CartTota
           </span>
         </div>
 
-        {cart.subtotal < 50 && cart.shipping! > 0 && (
+        {(Number(cart.subtotal) || 0) < 50 && (Number(cart.shipping) || 0) > 0 && (
           <div className="bg-blue-100 rounded-lg p-3 text-center">
             <p className="text-sm font-medium text-blue-700">
-              Add ${(50 - cart.subtotal).toFixed(2)} more for FREE shipping! 🚚
+              Add ${(50 - (Number(cart.subtotal) || 0)).toFixed(2)} more for FREE shipping! 🚚
             </p>
           </div>
         )}
@@ -48,7 +48,7 @@ export function CartTotals({ cart, on_continue_shopping, on_checkout }: CartTota
 
         <div className="flex justify-between text-lg font-bold text-gray-800">
           <span>Total</span>
-          <span>${cart.total.toFixed(2)}</span>
+          <span>${(Number(cart.total) || 0).toFixed(2)}</span>
         </div>
       </div>
 

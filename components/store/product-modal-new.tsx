@@ -25,7 +25,7 @@ export function ProductModalNew({ product, is_open, on_close }: ProductModalProp
   const [quantity, set_quantity] = useState(1)
   const [current_image_index, set_current_image_index] = useState(0)
   const [is_adding_to_cart, set_is_adding_to_cart] = useState(false)
-  const [active_tab, set_active_tab] = useState<'overview' | 'specs' | 'reviews'>('overview')
+  const [active_tab, set_active_tab] = useState<'overview' | 'specs' | 'reviews'>('specs')
 
   const images = product.images || [product.image]
 
@@ -250,17 +250,6 @@ export function ProductModalNew({ product, is_open, on_close }: ProductModalProp
                 <div className="border-b border-gray-200">
                   <div className="flex space-x-4">
                     <button
-                      onClick={() => set_active_tab('overview')}
-                      className={cn(
-                        "pb-2 text-sm font-medium border-b-2 transition-colors",
-                        active_tab === 'overview'
-                          ? "border-red-500 text-red-600"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
-                      )}
-                    >
-                      Overview
-                    </button>
-                    <button
                       onClick={() => set_active_tab('specs')}
                       className={cn(
                         "pb-2 text-sm font-medium border-b-2 transition-colors",
@@ -270,6 +259,17 @@ export function ProductModalNew({ product, is_open, on_close }: ProductModalProp
                       )}
                     >
                       Specs
+                    </button>
+                    <button
+                      onClick={() => set_active_tab('overview')}
+                      className={cn(
+                        "pb-2 text-sm font-medium border-b-2 transition-colors",
+                        active_tab === 'overview'
+                          ? "border-red-500 text-red-600"
+                          : "border-transparent text-gray-500 hover:text-gray-700"
+                      )}
+                    >
+                      Overview
                     </button>
                     <button
                       onClick={() => set_active_tab('reviews')}

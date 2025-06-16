@@ -123,19 +123,19 @@ const calculate_cart_totals = (
   items: CartItem[],
   coupon?: { code: string; discount: number },
 ): Omit<Cart, "items" | "coupon"> => {
-  const subtotal = items.reduce((sum, item) => sum + item.total_price, 0)
-  const discount = coupon ? (subtotal * coupon.discount) / 100 : 0
+  const subtotal = items.reduce((sum, item) => sum + (Number(item.total_price) || 0), 0)
+  const discount = coupon ? (subtotal * (Number(coupon.discount) || 0)) / 100 : 0
   const tax = (subtotal - discount) * 0.08
   const shipping = subtotal > 75 ? 0 : subtotal > 50 ? 4.99 : 9.99
   const total = subtotal - discount + tax + shipping
 
   return {
-    total_items: items.reduce((sum, item) => sum + item.quantity, 0),
-    subtotal: Math.round(subtotal * 100) / 100,
-    discount: Math.round(discount * 100) / 100,
-    tax: Math.round(tax * 100) / 100,
-    shipping: Math.round(shipping * 100) / 100,
-    total: Math.round(total * 100) / 100,
+    total_items: items.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0),
+    subtotal: Math.round((Number(subtotal) || 0) * 100) / 100,
+    discount: Math.round((Number(discount) || 0) * 100) / 100,
+    tax: Math.round((Number(tax) || 0) * 100) / 100,
+    shipping: Math.round((Number(shipping) || 0) * 100) / 100,
+    total: Math.round((Number(total) || 0) * 100) / 100,
   }
 }
 
@@ -286,13 +286,13 @@ export const useStoreState = create<StoreState>()(
 
       add_to_cart: (product, quantity = 1, variants = {}) => {
         set((state) => {
-          // Calculate price with variants
-          let item_price = product.price
+          // Calculate price with variants - using safe number conversion
+          let item_price = Number(product.price) || 0
           if (variants && product.variants) {
             for (const [variant_type, selected_value] of Object.entries(variants)) {
               const variant = product.variants.find((v) => v.type === variant_type && v.value === selected_value)
               if (variant?.price_modifier) {
-                item_price += variant.price_modifier
+                item_price += Number(variant.price_modifier) || 0
               }
             }
           }
@@ -350,9 +350,9 @@ export const useStoreState = create<StoreState>()(
 
         set((state) => {
           const item = state.cart.items.find((item) => item.id === cart_item_id)
-          if (item) {
-            const unit_price = item.total_price / item.quantity
-            item.quantity = quantity
+          if (item && item.quantity > 0) {
+            const unit_price = (Number(item.total_price) || 0) / (Number(item.quantity) || 1)
+            item.quantity = Number(quantity) || 1
             item.total_price = Math.round(quantity * unit_price * 100) / 100
 
             const totals = calculate_cart_totals(state.cart.items, state.cart.coupon || undefined)

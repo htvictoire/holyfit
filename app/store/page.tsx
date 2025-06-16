@@ -100,17 +100,35 @@ export default function StorePage() {
 
   const handle_add_to_cart = (product: Product) => {
     console.log("Add to cart clicked for product:", product.name)
+    
+    if (!product.in_stock) {
+      toast({
+        title: "Out of Stock",
+        description: `${product.name} is currently out of stock`,
+        variant: "destructive",
+      })
+      return
+    }
+
     if (product.variants && product.variants.length > 0) {
       console.log("Product has variants, opening modal")
       open_product_modal(product)
     } else {
       console.log("Adding product to cart directly")
-      add_to_cart(product)
-      toast({
-        title: "Added to Cart! 🛒",
-        description: `${product.name} has been added to your cart`,
-        duration: 3000,
-      })
+      try {
+        add_to_cart(product)
+        toast({
+          title: "Added to Cart! 🎉",
+          description: `${product.name} has been added to your cart`,
+          duration: 3000,
+        })
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to add item to cart. Please try again.",
+          variant: "destructive",
+        })
+      }
     }
   }
 
@@ -124,11 +142,33 @@ export default function StorePage() {
   }
 
   const handle_search_change = (value: string) => {
-    set_filters({ search: value })
-    // Auto-switch to 'all' mode and list view when search is active
-    if (value.trim() && layout_mode === "featured") {
-      set_layout_mode("standard")
-      set_view_mode("list")
+    try {
+      set_filters({ search: value })
+      // Auto-switch to 'all' mode and list view when search is active
+      if (value.trim() && layout_mode === "featured") {
+        set_layout_mode("standard")
+        set_view_mode("list")
+      }
+      
+      // Show toast when search returns no results after user has typed something
+      if (value.trim() && filtered_products.length === 0) {
+        setTimeout(() => {
+          if (filtered_products.length === 0) {
+            toast({
+              title: "No Results Found",
+              description: `No products found for "${value}". Try different keywords.`,
+              variant: "destructive",
+              duration: 3000,
+            })
+          }
+        }, 500) // Small delay to allow filtering to complete
+      }
+    } catch (error) {
+      toast({
+        title: "Search Error",
+        description: "Failed to perform search. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
@@ -150,17 +190,26 @@ export default function StorePage() {
   }
 
   const handle_clear_filters = () => {
-    set_filters({
-      search: "",
-      category: undefined,
-      in_stock_only: false,
-      price_range: undefined,
-    })
-    set_price_range([0, 1000])
-    toast({
-      title: "Filters Cleared",
-      description: "All filters have been reset",
-    })
+    try {
+      set_filters({
+        search: "",
+        category: undefined,
+        in_stock_only: false,
+        price_range: undefined,
+      })
+      set_price_range([0, 1000])
+      toast({
+        title: "Filters Cleared ✨",
+        description: "All filters have been reset",
+        duration: 2000,
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to clear filters. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   const stats = useMemo(
@@ -195,7 +244,7 @@ export default function StorePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
-      <StoreHeader total_items={cart.total_items} total_amount={cart.total} on_cart_click={toggle_cart} />
+      <StoreHeader total_items={Number(cart.total_items) || 0} total_amount={Number(cart.total) || 0} on_cart_click={toggle_cart} />
 
       {/* Advanced Search & Filter Bar */}
       <motion.div
@@ -259,8 +308,8 @@ export default function StorePage() {
                         )}
                       </div>
                       <div className="text-left">
-                        <div className="text-sm font-semibold">${cart.total.toFixed(2)}</div>
-                        <div className="text-xs opacity-90">{cart.total_items} items</div>
+                        <div className="text-sm font-semibold">${(Number(cart.total) || 0).toFixed(2)}</div>
+                        <div className="text-xs opacity-90">{Number(cart.total_items) || 0} items</div>
                       </div>
                     </div>
                   </Button>
@@ -433,8 +482,8 @@ export default function StorePage() {
                       )}
                     </div>
                     <div className="text-left">
-                      <div className="text-sm font-semibold">${cart.total.toFixed(2)}</div>
-                      <div className="text-xs opacity-90">{cart.total_items} items</div>
+                      <div className="text-sm font-semibold">${(Number(cart.total) || 0).toFixed(2)}</div>
+                      <div className="text-xs opacity-90">{Number(cart.total_items) || 0} items</div>
                     </div>
                   </div>
                 </Button>

@@ -73,7 +73,7 @@ export function CheckoutModalNew() {
 
       if (delivery_method === "whatsapp") {
         const order_summary = cart.items
-          .map((item) => `• ${item.product.name} (x${item.quantity}) - $${item.total_price.toFixed(2)}`)
+          .map((item) => `• ${item.product.name} (x${item.quantity}) - $${(Number(item.total_price) || 0).toFixed(2)}`)
           .join("\n")
 
         const message = `
@@ -88,7 +88,7 @@ ${data.address}, ${data.city} ${data.zip_code}
 *Items:*
 ${order_summary}
 
-*Total: $${cart.total.toFixed(2)}*
+*Total: $${(Number(cart.total) || 0).toFixed(2)}*
 
 ${data.notes ? `Notes: ${data.notes}` : ""}
         `.trim()
@@ -204,7 +204,7 @@ ${data.notes ? `Notes: ${data.notes}` : ""}
                           )}
                           <div className="flex justify-between items-center mt-1">
                             <span className="text-xs text-gray-600">Qty: {item.quantity}</span>
-                            <span className="font-semibold text-gray-800 text-xs">${item.total_price.toFixed(2)}</span>
+                            <span className="font-semibold text-gray-800 text-xs">${(Number(item.total_price) || 0).toFixed(2)}</span>
                           </div>
                         </div>
                       </div>
@@ -215,7 +215,7 @@ ${data.notes ? `Notes: ${data.notes}` : ""}
                   <div className="bg-gray-50 rounded-lg p-3 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium">${cart.subtotal.toFixed(2)}</span>
+                      <span className="font-medium">${(Number(cart.subtotal) || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Tax</span>
@@ -234,7 +234,7 @@ ${data.notes ? `Notes: ${data.notes}` : ""}
                     <div className="border-t border-gray-200 pt-2">
                       <div className="flex justify-between text-lg font-bold">
                         <span>Total</span>
-                        <span className="text-blue-600">${cart.total.toFixed(2)}</span>
+                        <span className="text-blue-600">${(Number(cart.total) || 0).toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
@@ -512,7 +512,7 @@ ${data.notes ? `Notes: ${data.notes}` : ""}
                   ) : (
                     <div className="flex items-center gap-2">
                       <CheckCircle className="w-5 h-5" />
-                      Complete Order - ${cart.total.toFixed(2)}
+                      Complete Order - ${(Number(cart.total) || 0).toFixed(2)}
                     </div>
                   )}
                 </Button>

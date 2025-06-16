@@ -71,7 +71,7 @@ export function CartItem({ item, on_update_quantity, on_remove }: CartItemProps)
             </div>
 
             <div className="flex items-center space-x-2">
-              <span className="text-sm font-bold text-gray-800">${item.total_price.toFixed(2)}</span>
+              <span className="text-sm font-bold text-gray-800">${(Number(item.total_price) || 0).toFixed(2)}</span>
               <Button
                 size="sm"
                 variant="ghost"
