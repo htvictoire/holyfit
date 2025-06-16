@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { motion, AnimatePresence } from "framer-motion"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/components/ui/toast"
 import { cn } from "@/lib/utils"
 import type { Product } from "@/types/store-types"
 
@@ -58,7 +58,7 @@ export function ProductModalNew({ product, is_open, on_close }: ProductModalProp
         toast({
           title: "Selection Required",
           description: `Please select: ${missing_variants.join(", ")}`,
-          variant: "destructive",
+          type: "error",
         })
         return
       }
@@ -72,6 +72,7 @@ export function ProductModalNew({ product, is_open, on_close }: ProductModalProp
       toast({
         title: "Added to Cart! 🎉",
         description: `${product.name} has been added to your cart`,
+        type: "success",
         duration: 3000,
       })
 
@@ -82,7 +83,7 @@ export function ProductModalNew({ product, is_open, on_close }: ProductModalProp
       toast({
         title: "Error",
         description: "Failed to add item to cart. Please try again.",
-        variant: "destructive",
+        type: "error",
       })
     } finally {
       set_is_adding_to_cart(false)

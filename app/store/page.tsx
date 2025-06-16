@@ -35,7 +35,7 @@ import { CartModal } from "@/components/store/cart-modal"
 import { CheckoutModalNew } from "@/components/store/checkout-modal-new"
 import { ProductModalNew } from "@/components/store/product-modal-new"
 import { EmptyState } from "@/components/store/empty-state"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/components/ui/toast"
 import type { Product } from "@/types/store-types"
 import { fetchStoreData } from "@/services/store-service"
 
@@ -105,7 +105,7 @@ export default function StorePage() {
       toast({
         title: "Out of Stock",
         description: `${product.name} is currently out of stock`,
-        variant: "destructive",
+        type: "error",
       })
       return
     }
@@ -120,13 +120,14 @@ export default function StorePage() {
         toast({
           title: "Added to Cart! 🎉",
           description: `${product.name} has been added to your cart`,
+          type: "success",
           duration: 3000,
         })
       } catch (error) {
         toast({
           title: "Error",
           description: "Failed to add item to cart. Please try again.",
-          variant: "destructive",
+          type: "error",
         })
       }
     }
@@ -157,7 +158,7 @@ export default function StorePage() {
             toast({
               title: "No Results Found",
               description: `No products found for "${value}". Try different keywords.`,
-              variant: "destructive",
+              type: "warning",
               duration: 3000,
             })
           }
@@ -167,7 +168,7 @@ export default function StorePage() {
       toast({
         title: "Search Error",
         description: "Failed to perform search. Please try again.",
-        variant: "destructive",
+        type: "error",
       })
     }
   }
@@ -201,13 +202,14 @@ export default function StorePage() {
       toast({
         title: "Filters Cleared ✨",
         description: "All filters have been reset",
+        type: "success",
         duration: 2000,
       })
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to clear filters. Please try again.",
-        variant: "destructive",
+        type: "error",
       })
     }
   }
@@ -958,7 +960,7 @@ export default function StorePage() {
               toast({
                 title: "Your cart is empty",
                 description: "Add some products to your cart first",
-                variant: "destructive",
+                type: "error",
               })
               return
             }
