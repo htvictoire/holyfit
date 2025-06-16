@@ -77,7 +77,7 @@ export default function StorePage() {
   const [show_filters, set_show_filters] = useState(false)
   const [loading, set_loading] = useState(true)
   const [filter_loading, set_filter_loading] = useState(false)
-  const [show_mobile_search, setShowMobileSearch] = useState(false)
+  const [show_search_modal, setShowSearchModal] = useState(false)
 
   // Initialize store
   useEffect(() => {
@@ -207,88 +207,90 @@ export default function StorePage() {
           {/* Mobile Layout */}
           <div className="lg:hidden">
             {/* Mobile Header - Single Row */}
-            <div className="flex items-center gap-3">
-              {/* Search Icon - Expandable */}
-              <div className="flex-1">
-                {!show_mobile_search ? (
+            <div className="flex items-center justify-center gap-2 px-2">
+              {!show_search_modal ? (
+                <>
+                  {/* Search Icon */}
                   <Button
                     variant="outline"
-                    onClick={() => setShowMobileSearch(true)}
-                    className="w-full h-12 border-gray-300 hover:bg-gray-50 rounded-xl justify-start"
+                    onClick={() => setShowSearchModal(true)}
+                    className="h-12 px-4 border-gray-300 hover:bg-gray-50 rounded-xl flex-shrink-0"
                   >
-                    <Search className="w-5 h-5 mr-2 text-gray-400" />
-                    <span className="text-gray-500">Search...</span>
+                    <Search className="w-5 h-5 text-gray-400" />
                   </Button>
-                ) : (
-                  <div className="relative">
+
+                  {/* Filters Button */}
+                  <Button
+                    variant="outline"
+                    onClick={() => set_show_filters(!show_filters)}
+                    className="h-12 px-3 border-gray-300 hover:bg-gray-50 rounded-xl flex-shrink-0"
+                  >
+                    <SlidersHorizontal className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="text-sm">Filters</span>
+                    {Object.values(filters).some(
+                      (v) => v && v !== "" && JSON.stringify(v) !== JSON.stringify({ min: 0, max: 1000 }),
+                    ) && (
+                      <Badge className="ml-2 bg-purple-600 text-white flex-shrink-0 text-xs">
+                        {
+                          Object.values(filters).filter(
+                            (v) => v && v !== "" && JSON.stringify(v) !== JSON.stringify({ min: 0, max: 1000 }),
+                          ).length
+                        }
+                      </Badge>
+                    )}
+                  </Button>
+
+                  {/* Cart Button - Takes remaining space */}
+                  <Button
+                    onClick={toggle_cart}
+                    className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 px-4 rounded-xl shadow-lg flex-1 max-w-[180px]"
+                  >
+                    <div className="flex items-center gap-2 justify-center">
+                      <div className="relative flex-shrink-0">
+                        <ShoppingCart className="w-5 h-5" />
+                        {cart.total_items > 0 && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
+                          >
+                            {cart.total_items}
+                          </motion.div>
+                        )}
+                      </div>
+                      <div className="text-left">
+                        <div className="text-sm font-semibold">${cart.total.toFixed(2)}</div>
+                        <div className="text-xs opacity-90">{cart.total_items} items</div>
+                      </div>
+                    </div>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {/* Inline Search Mode */}
+                  <div className="relative flex-1">
                     <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <Input
                       placeholder="Search fitness products..."
                       value={filters.search}
                       onChange={(e) => handle_search_change(e.target.value)}
-                      className="pl-12 pr-20 h-12 border-gray-300 focus:border-purple-500 focus:ring-purple-500 rounded-xl text-base shadow-sm w-full"
+                      className={`pl-12 pr-4 h-12 focus:border-purple-500 focus:ring-purple-500 rounded-xl text-base shadow-sm w-full ${
+                        filters.search && filtered_products.length === 0 
+                          ? 'border-red-500 border-2' 
+                          : 'border-gray-300'
+                      }`}
                       autoFocus
                     />
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => {
-                        setShowMobileSearch(false)
-                        // Optional: Keep search active after search
-                      }}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 px-3 rounded-lg text-xs"
-                    >
-                      Search
-                    </Button>
                   </div>
-                )}
-              </div>
-
-              {/* Filters Button */}
-              <Button
-                variant="outline"
-                onClick={() => set_show_filters(!show_filters)}
-                className="h-12 px-4 border-gray-300 hover:bg-gray-50 rounded-xl flex-shrink-0"
-              >
-                <SlidersHorizontal className="w-4 h-4 mr-2" />
-                Filters
-                {Object.values(filters).some(
-                  (v) => v && v !== "" && JSON.stringify(v) !== JSON.stringify({ min: 0, max: 1000 }),
-                ) && (
-                  <Badge className="ml-2 bg-purple-600 text-white">
-                    {
-                      Object.values(filters).filter(
-                        (v) => v && v !== "" && JSON.stringify(v) !== JSON.stringify({ min: 0, max: 1000 }),
-                      ).length
-                    }
-                  </Badge>
-                )}
-              </Button>
-
-              {/* Cart Button */}
-              <Button
-                onClick={toggle_cart}
-                className="relative bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white h-12 px-4 rounded-xl shadow-lg flex-shrink-0"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <ShoppingCart className="w-5 h-5" />
-                    {cart.total_items > 0 && (
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs font-bold"
-                      >
-                        {cart.total_items}
-                      </motion.div>
-                    )}
-                  </div>
-                  <div className="text-left">
-                    <div className="text-sm font-semibold">${cart.total.toFixed(2)}</div>
-                    <div className="text-xs opacity-90">{cart.total_items} items</div>
-                  </div>
-                </div>
-              </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSearchModal(false)}
+                    className="h-12 px-4 border-gray-300 hover:bg-gray-50 rounded-xl flex-shrink-0"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -464,10 +466,13 @@ export default function StorePage() {
                   exit={{ x: -300, opacity: 0 }}
                   className="w-80 flex-shrink-0 lg:relative fixed top-0 left-0 h-full bg-white z-50 lg:z-auto lg:h-auto overflow-y-auto"
                 >
-                <div className="lg:sticky lg:top-32 space-y-8 p-4 lg:p-0">
+                <div className="lg:sticky lg:top-32 p-4 lg:p-0 space-y-4">
                   {/* Mobile Close Button */}
                   <div className="lg:hidden flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">Filters & Insights</h2>
+                    <h2 className="text-lg font-bold text-gray-800 flex items-center">
+                      <Filter className="w-5 h-5 mr-2 text-purple-600" />
+                      Filters & Insights
+                    </h2>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -478,179 +483,161 @@ export default function StorePage() {
                     </Button>
                   </div>
 
-                  {/* Advanced Filters Card */}
-                  <Card className="bg-white/80 backdrop-blur-lg border border-gray-200/50 shadow-xl">
-                    <CardHeader>
-                      <CardTitle className="flex items-center text-xl font-bold text-gray-800">
-                        <Filter className="w-6 h-6 mr-3 text-purple-600" />
-                        Advanced Filters
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-8">
-                      {/* Mobile Only: Category Selector */}
-                      <div className="lg:hidden">
-                        <label className="text-sm font-semibold mb-3 block text-gray-700">
-                          Category
-                        </label>
-                        <Select
-                          value={filters.category || "all"}
-                          onValueChange={(value) => {
-                            set_filters({ category: value === "all" ? undefined : value })
-                            if (value !== "all" && layout_mode === "featured") {
-                              set_layout_mode("standard")
-                              set_view_mode("list")
-                            }
-                          }}
-                        >
-                          <SelectTrigger className="h-11 border-gray-300 rounded-xl bg-white">
-                            <SelectValue placeholder="All Categories" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-white border border-gray-200 shadow-lg">
-                            <SelectItem value="all">All Categories</SelectItem>
-                            {categories.map((category) => (
-                              <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+                  {/* Mobile Only: Category Selector */}
+                  <div className="lg:hidden">
+                    <label className="text-sm font-semibold mb-2 block text-gray-700">
+                      Category
+                    </label>
+                    <Select
+                      value={filters.category || "all"}
+                      onValueChange={(value) => {
+                        set_filters({ category: value === "all" ? undefined : value })
+                        if (value !== "all" && layout_mode === "featured") {
+                          set_layout_mode("standard")
+                          set_view_mode("list")
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="h-10 border-gray-300 rounded-lg bg-white">
+                        <SelectValue placeholder="All Categories" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+                        <SelectItem value="all">All Categories</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                      {/* Mobile Only: Layout Mode Toggle */}
-                      <div className="lg:hidden">
-                        <label className="text-sm font-semibold mb-3 block text-gray-700">
-                          Layout Mode
-                        </label>
-                        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-                          <Button
-                            variant={layout_mode === "featured" ? "default" : "ghost"}
-                            size="sm"
-                            onClick={() => set_layout_mode("featured")}
-                            className="flex-1 rounded-lg h-10 text-sm"
-                          >
-                            <Sparkles className="w-4 h-4 mr-2" />
-                            Featured
-                          </Button>
-                          <Button
-                            variant={layout_mode === "standard" ? "default" : "ghost"}
-                            size="sm"
-                            onClick={() => set_layout_mode("standard")}
-                            className="flex-1 rounded-lg h-10 text-sm"
-                          >
-                            <LayoutGrid className="w-4 h-4 mr-2" />
-                            All
-                          </Button>
-                        </div>
-                      </div>
-
-                      {/* Mobile Only: View Mode Toggle */}
-                      <div className="lg:hidden">
-                        <label className="text-sm font-semibold mb-3 block text-gray-700">
-                          View Mode
-                        </label>
-                        <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1">
-                          <Button
-                            variant={view_mode === "grid" ? "default" : "ghost"}
-                            size="sm"
-                            onClick={() => set_view_mode("grid")}
-                            className="flex-1 rounded-lg h-10 text-sm"
-                          >
-                            <LayoutGrid className="w-4 h-4 mr-2" />
-                            Grid
-                          </Button>
-                          <Button
-                            variant={view_mode === "list" ? "default" : "ghost"}
-                            size="sm"
-                            onClick={() => set_view_mode("list")}
-                            className="flex-1 rounded-lg h-10 text-sm"
-                          >
-                            <List className="w-4 h-4 mr-2" />
-                            List
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="lg:hidden">
-                        <Separator />
-                      </div>
-
-                      {/* Price Range */}
-                      <div>
-                        <label className="text-sm font-semibold mb-4 block text-gray-700">
-                          Price Range: ${price_range[0]} - ${price_range[1]}
-                        </label>
-                        <div className="px-3 mb-4">
-                          <Slider
-                            value={price_range}
-                            onValueChange={handle_price_range_change}
-                            max={1000}
-                            step={10}
-                            className="w-full"
-                          />
-                        </div>
-                        {filter_loading && <Progress value={66} className="h-1" />}
-                      </div>
-
-                      {/* Stock Filter */}
-                      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-200">
-                        <label htmlFor="in_stock" className="text-sm font-semibold text-gray-700">
-                          Show In Stock Only
-                        </label>
-                        <Checkbox
-                          id="in_stock"
-                          checked={filters.in_stock_only}
-                          onCheckedChange={(checked) => {
-                            set_filters({ in_stock_only: !!checked })
-                            // Auto-switch to 'all' mode and list view when stock filter is active
-                            if (checked && layout_mode === "featured") {
-                              set_layout_mode("standard")
-                              set_view_mode("list")
-                            }
-                          }}
-                        />
-                      </div>
-
-                      <Separator />
-
+                  {/* Mobile Only: Layout Mode Toggle */}
+                  <div className="lg:hidden">
+                    <label className="text-sm font-semibold mb-2 block text-gray-700">
+                      Layout Mode
+                    </label>
+                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
                       <Button
-                        variant="outline"
-                        onClick={handle_clear_filters}
-                        className="w-full border-gray-300 hover:bg-gray-50 rounded-xl h-12"
+                        variant={layout_mode === "featured" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => set_layout_mode("featured")}
+                        className="flex-1 rounded-md h-8 text-xs"
                       >
-                        Clear All Filters
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        Featured
                       </Button>
-                    </CardContent>
-                  </Card>
+                      <Button
+                        variant={layout_mode === "standard" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => set_layout_mode("standard")}
+                        className="flex-1 rounded-md h-8 text-xs"
+                      >
+                        <LayoutGrid className="w-3 h-3 mr-1" />
+                        All
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Mobile Only: View Mode Toggle */}
+                  <div className="lg:hidden">
+                    <label className="text-sm font-semibold mb-2 block text-gray-700">
+                      View Mode
+                    </label>
+                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                      <Button
+                        variant={view_mode === "grid" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => set_view_mode("grid")}
+                        className="flex-1 rounded-md h-8 text-xs"
+                      >
+                        <LayoutGrid className="w-3 h-3 mr-1" />
+                        Grid
+                      </Button>
+                      <Button
+                        variant={view_mode === "list" ? "default" : "ghost"}
+                        size="sm"
+                        onClick={() => set_view_mode("list")}
+                        className="flex-1 rounded-md h-8 text-xs"
+                      >
+                        <List className="w-3 h-3 mr-1" />
+                        List
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="lg:hidden border-t border-gray-200 pt-3"></div>
+
+                  {/* Price Range */}
+                  <div>
+                    <label className="text-sm font-semibold mb-2 block text-gray-700">
+                      Price Range: ${price_range[0]} - ${price_range[1]}
+                    </label>
+                    <div className="px-2 mb-2">
+                      <Slider
+                        value={price_range}
+                        onValueChange={handle_price_range_change}
+                        max={1000}
+                        step={10}
+                        className="w-full"
+                      />
+                    </div>
+                    {filter_loading && <Progress value={66} className="h-1" />}
+                  </div>
+
+                  {/* Stock Filter */}
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                    <label htmlFor="in_stock" className="text-sm font-semibold text-gray-700">
+                      Show In Stock Only
+                    </label>
+                    <Checkbox
+                      id="in_stock"
+                      checked={filters.in_stock_only}
+                      onCheckedChange={(checked) => {
+                        set_filters({ in_stock_only: !!checked })
+                        if (checked && layout_mode === "featured") {
+                          set_layout_mode("standard")
+                          set_view_mode("list")
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <Button
+                    variant="outline"
+                    onClick={handle_clear_filters}
+                    className="w-full border-gray-300 hover:bg-gray-50 rounded-lg h-10 text-sm"
+                  >
+                    Clear All Filters
+                  </Button>
+
+                  <div className="border-t border-gray-200 pt-3"></div>
 
                   {/* Store Statistics */}
-                  <Card className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white shadow-2xl">
-                    <CardHeader>
-                      <CardTitle className="flex items-center text-xl font-bold">
-                        <TrendingUp className="w-6 h-6 mr-3" />
-                        Store Insights
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="text-center p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                          <div className="text-2xl font-bold">{stats.filtered_count}</div>
-                          <div className="text-xs opacity-90">Products</div>
-                        </div>
-                        <div className="text-center p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                          <div className="text-2xl font-bold text-green-300">{stats.in_stock_count}</div>
-                          <div className="text-xs opacity-90">In Stock</div>
-                        </div>
-                        <div className="text-center p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                          <div className="text-2xl font-bold text-yellow-300">{stats.on_sale_count}</div>
-                          <div className="text-xs opacity-90">On Sale</div>
-                        </div>
-                        <div className="text-center p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-                          <div className="text-2xl font-bold">{stats.avg_rating.toFixed(1)}</div>
-                          <div className="text-xs opacity-90">Avg Rating</div>
-                        </div>
+                  <div className="bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 text-white rounded-lg p-4">
+                    <div className="flex items-center mb-3">
+                      <TrendingUp className="w-5 h-5 mr-2" />
+                      <h3 className="font-bold text-sm">Store Insights</h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="text-center p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <div className="text-lg font-bold">{stats.filtered_count}</div>
+                        <div className="text-xs opacity-90">Products</div>
                       </div>
-                    </CardContent>
-                  </Card>
+                      <div className="text-center p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <div className="text-lg font-bold text-green-300">{stats.in_stock_count}</div>
+                        <div className="text-xs opacity-90">In Stock</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <div className="text-lg font-bold text-yellow-300">{stats.on_sale_count}</div>
+                        <div className="text-xs opacity-90">On Sale</div>
+                      </div>
+                      <div className="text-center p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                        <div className="text-lg font-bold">{stats.avg_rating.toFixed(1)}</div>
+                        <div className="text-xs opacity-90">Avg Rating</div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 </motion.div>
               </>
@@ -960,6 +947,7 @@ export default function StorePage() {
           Checkout via WhatsApp
         </Button>
       </div> */}
+
 
       {/* Modals */}
       <CartModal />
